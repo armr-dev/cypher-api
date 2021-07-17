@@ -103,8 +103,8 @@ func handleRequests() {
 	myRouter := mux.NewRouter().StrictSlash(true)
 
 	myRouter.HandleFunc("/", homePage)
-	myRouter.HandleFunc("/cypher", cypherText).Methods("POST")
-	myRouter.HandleFunc("/decipher", decipherText).Methods("POST")
+	myRouter.HandleFunc("/cypher", cypherText).Methods("POST", "OPTIONS")
+	myRouter.HandleFunc("/decipher", decipherText).Methods("POST", "OPTIONS")
 
 	var port string
 
