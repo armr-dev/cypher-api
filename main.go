@@ -11,6 +11,7 @@ import (
 	"github.com/armr-dev/cypher-api-go/pkg/cmd/3des"
 	"github.com/armr-dev/cypher-api-go/pkg/cmd/blowfish"
 	"github.com/armr-dev/cypher-api-go/pkg/cmd/des"
+	"github.com/armr-dev/cypher-api-go/pkg/cmd/aes"
 	"github.com/gorilla/mux"
 )
 
@@ -25,10 +26,6 @@ type Data struct {
 
 type Response struct {
 	Data `json:"data"`
-}
-
-func enableCors(w *http.ResponseWriter) {
-	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }
 
 func setupResponse(w *http.ResponseWriter, r *http.Request) {
@@ -54,6 +51,9 @@ func cypherText(w http.ResponseWriter, r *http.Request) {
 	var encryptedText string
 	
 	switch request.Algorithm {
+	case "aes":
+		encryptedText, _ = AES.Encrypt(request.Text)
+
 	case "des":
 		encryptedText, _ = DES.Encrypt(request.Text)
 		
@@ -62,6 +62,9 @@ func cypherText(w http.ResponseWriter, r *http.Request) {
 		
 	case "blowfish":
 		encryptedText = Blowfish.Encrypt(request.Text)
+	
+	default:
+		encryptedText = "Error"
 	}
 	
 	var response Response
@@ -82,6 +85,9 @@ func decipherText(w http.ResponseWriter, r *http.Request) {
 	var decryptedText string
 
 	switch request.Algorithm {
+	case "aes":
+		decryptedText, _ = AES.Decrypt(request.Text)
+
 	case "des":
 		decryptedText, _ = DES.Decrypt(request.Text)
 
@@ -90,6 +96,9 @@ func decipherText(w http.ResponseWriter, r *http.Request) {
 
 	case "blowfish":
 		decryptedText, _ = Blowfish.Decrypt(request.Text)
+
+	default:
+		decryptedText = "Error"
 	}
 
 	var response Response
