@@ -19,43 +19,60 @@ type Request struct {
 	Algorithm string `json:"algorithm"`
 }
 
-type Response struct {
+type Data struct {
 	Text string `json:"text"`
 }
 
+type Response struct {
+	Data `json:"data"`
+}
+
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+}
+
+func setupResponse(w *http.ResponseWriter, r *http.Request) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+	(*w).Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	(*w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+}
+
 func homePage(w http.ResponseWriter, r *http.Request) {
+	setupResponse(&w, r)
 	fmt.Fprintf(w, "Welcome to the home page!")
 	fmt.Println("Endpoint Hit: homepage")
 }
 
 func cypherText(w http.ResponseWriter, r *http.Request) {
+	setupResponse(&w, r)
 	reqBody, _ := ioutil.ReadAll(r.Body)
-
+	
 	var request Request
-
+	
 	json.Unmarshal(reqBody, &request)
-
+	
 	var encryptedText string
-
+	
 	switch request.Algorithm {
 	case "des":
 		encryptedText, _ = DES.Encrypt(request.Text)
-
+		
 	case "3des":
 		encryptedText, _ = TripleDES.Encrypt(request.Text)
-
+		
 	case "blowfish":
 		encryptedText = Blowfish.Encrypt(request.Text)
 	}
-
+	
 	var response Response
-
-	response.Text = encryptedText
-
+	
+	response.Data.Text = encryptedText
+	
 	json.NewEncoder(w).Encode(response)
 }
 
 func decipherText(w http.ResponseWriter, r *http.Request) {
+	setupResponse(&w, r)
 	reqBody, _ := ioutil.ReadAll(r.Body)
 
 	var request Request
@@ -72,13 +89,12 @@ func decipherText(w http.ResponseWriter, r *http.Request) {
 		decryptedText, _ = TripleDES.Decrypt(request.Text)
 
 	case "blowfish":
-	default:
 		decryptedText, _ = Blowfish.Decrypt(request.Text)
 	}
 
 	var response Response
 
-	response.Text = decryptedText
+	response.Data.Text = decryptedText
 
 	json.NewEncoder(w).Encode(response)
 }
