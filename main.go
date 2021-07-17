@@ -45,7 +45,6 @@ func cypherText(w http.ResponseWriter, r *http.Request) {
 		encryptedText, _ = TripleDES.Encrypt(request.Text)
 
 	case "blowfish":
-	default:
 		encryptedText = Blowfish.Encrypt(request.Text)
 	}
 
