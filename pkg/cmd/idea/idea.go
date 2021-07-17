@@ -1,19 +1,24 @@
-package AES
+package Idea
 
 import (
 	"bytes"
-	"crypto/aes"
 	"crypto/cipher"
 	"encoding/hex"
+	"fmt"
+
+	"github.com/dgryski/go-idea"
 )
+
 var key = []byte("1234567890123456")
-var iv = []byte("6543210987654321")
+var iv = []byte("65432109")
+var ideaBlockSize = 8
 
 func Encrypt(data string) (string, error) {
 	parsedData := []byte(data)
-	block, err := aes.NewCipher(key)
+	block, err := idea.NewCipher(key)
 	
 	if err != nil {
+		fmt.Println(err)
 		return "", err
 	}
 
@@ -27,20 +32,20 @@ func Encrypt(data string) (string, error) {
 
 func Decrypt(data string) (string, error) {
 	parsedData, _ := hex.DecodeString(data)
-	block, err := aes.NewCipher(key)
+	block, err := idea.NewCipher(key)
 
 	if err != nil {
 		return "", err
 	}
 
-	if len(parsedData) < aes.BlockSize {
+	if len(parsedData) < ideaBlockSize {
 		panic("ciphertext too short")
 	}
 
 	blockMode := cipher.NewCBCDecrypter(block, iv)
 	cryptText := make([]byte, len(parsedData))
 	blockMode.CryptBlocks(cryptText, parsedData)
-	cryptText = pkcs5Depadding(cryptText, aes.BlockSize)
+	cryptText = pkcs5Depadding(cryptText, ideaBlockSize)
 
 	return string(cryptText), nil
 }

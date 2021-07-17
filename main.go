@@ -12,6 +12,7 @@ import (
 	"github.com/armr-dev/cypher-api-go/pkg/cmd/blowfish"
 	"github.com/armr-dev/cypher-api-go/pkg/cmd/des"
 	"github.com/armr-dev/cypher-api-go/pkg/cmd/aes"
+	"github.com/armr-dev/cypher-api-go/pkg/cmd/idea"
 	"github.com/gorilla/mux"
 )
 
@@ -62,6 +63,9 @@ func cypherText(w http.ResponseWriter, r *http.Request) {
 		
 	case "blowfish":
 		encryptedText = Blowfish.Encrypt(request.Text)
+
+	case "idea":
+		encryptedText, _ = Idea.Encrypt(request.Text)
 	
 	default:
 		encryptedText = "Error"
@@ -96,6 +100,9 @@ func decipherText(w http.ResponseWriter, r *http.Request) {
 
 	case "blowfish":
 		decryptedText, _ = Blowfish.Decrypt(request.Text)
+
+	case "idea":
+		decryptedText, _ = Idea.Decrypt(request.Text)
 
 	default:
 		decryptedText = "Error"
