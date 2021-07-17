@@ -1,22 +1,26 @@
 package main
 
 import (
-	"os"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 
-	"github.com/armr-dev/cypher-api-go/pkg/cmd/des"
 	"github.com/armr-dev/cypher-api-go/pkg/cmd/3des"
 	"github.com/armr-dev/cypher-api-go/pkg/cmd/blowfish"
+	"github.com/armr-dev/cypher-api-go/pkg/cmd/des"
 	"github.com/gorilla/mux"
 )
 
 type Request struct {
-	Text 			string `json:"text"`
+	Text      string `json:"text"`
 	Algorithm string `json:"algorithm"`
+}
+
+type Response struct {
+	Text string `json:"text"`
 }
 
 func homePage(w http.ResponseWriter, r *http.Request) {
@@ -33,18 +37,23 @@ func cypherText(w http.ResponseWriter, r *http.Request) {
 
 	var encryptedText string
 
-	switch (request.Algorithm) {
+	switch request.Algorithm {
 	case "des":
 		encryptedText, _ = DES.Encrypt(request.Text)
 
 	case "3des":
 		encryptedText, _ = TripleDES.Encrypt(request.Text)
 
-	case "blowfish": default:
+	case "blowfish":
+	default:
 		encryptedText = Blowfish.Encrypt(request.Text)
 	}
 
-	fmt.Fprintf(w, "%+v", encryptedText)
+	var response Response
+
+	response.Text = encryptedText
+
+	json.NewEncoder(w).Encode(response)
 }
 
 func decipherText(w http.ResponseWriter, r *http.Request) {
@@ -55,19 +64,24 @@ func decipherText(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(reqBody, &request)
 
 	var decryptedText string
-	
-	switch (request.Algorithm) {
+
+	switch request.Algorithm {
 	case "des":
 		decryptedText, _ = DES.Decrypt(request.Text)
 
 	case "3des":
 		decryptedText, _ = TripleDES.Decrypt(request.Text)
 
-	case "blowfish": default:
+	case "blowfish":
+	default:
 		decryptedText, _ = Blowfish.Decrypt(request.Text)
 	}
 
-	fmt.Fprintf(w, "%+v", string(decryptedText))
+	var response Response
+
+	response.Text = decryptedText
+
+	json.NewEncoder(w).Encode(response)
 }
 
 func handleRequests() {
@@ -80,7 +94,7 @@ func handleRequests() {
 	var port string
 
 	_, envExists := os.LookupEnv("PORT")
-	
+
 	if envExists {
 		port = os.Getenv("PORT")
 	} else {
@@ -90,6 +104,6 @@ func handleRequests() {
 	log.Fatal(http.ListenAndServe(":"+port, myRouter))
 }
 
-func main () {
+func main() {
 	handleRequests()
 }
