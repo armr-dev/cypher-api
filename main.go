@@ -76,7 +76,7 @@ func handleRequests() {
 		port = "8080"
 	}
 
-	log.Fatal(http.ListenAndServe(port, myRouter))
+	log.Fatal(http.ListenAndServe(":"+port, myRouter))
 }
 
 func main () {
