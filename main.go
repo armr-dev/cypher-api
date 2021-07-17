@@ -64,7 +64,7 @@ func decipherText(w http.ResponseWriter, r *http.Request) {
 		decryptedText, _ = TripleDES.Decrypt(request.Text)
 
 	case "blowfish": default:
-		decryptedText = Blowfish.Decrypt(request.Text)
+		decryptedText, _ = Blowfish.Decrypt(request.Text)
 	}
 
 	fmt.Fprintf(w, "%+v", string(decryptedText))
@@ -74,8 +74,8 @@ func handleRequests() {
 	myRouter := mux.NewRouter().StrictSlash(true)
 
 	myRouter.HandleFunc("/", homePage)
-	myRouter.HandleFunc("/cypher", cypherText)
-	myRouter.HandleFunc("/decipher", decipherText)
+	myRouter.HandleFunc("/cypher", cypherText).Methods("POST")
+	myRouter.HandleFunc("/decipher", decipherText).Methods("POST")
 
 	var port string
 
