@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -65,7 +66,17 @@ func handleRequests() {
 	myRouter.HandleFunc("/cypher", cypherText)
 	myRouter.HandleFunc("/decipher", decipherText)
 
-	log.Fatal(http.ListenAndServe(":8080", myRouter))
+	var port string
+
+	_, envExists := os.LookupEnv("PORT")
+	
+	if envExists {
+		port = os.Getenv("PORT")
+	} else {
+		port = "8080"
+	}
+
+	log.Fatal(http.ListenAndServe(port, myRouter))
 }
 
 func main () {
