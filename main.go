@@ -54,7 +54,18 @@ func decipherText(w http.ResponseWriter, r *http.Request) {
 
 	json.Unmarshal(reqBody, &request)
 
-	decryptedText, _ := DES.Decrypt(request.Text)
+	var decryptedText string
+	
+	switch (request.Algorithm) {
+	case "des":
+		decryptedText, _ = DES.Decrypt(request.Text)
+
+	case "3des":
+		decryptedText, _ = TripleDES.Decrypt(request.Text)
+
+	case "blowfish": default:
+		decryptedText = Blowfish.Decrypt(request.Text)
+	}
 
 	fmt.Fprintf(w, "%+v", string(decryptedText))
 }
