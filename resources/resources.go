@@ -1,4 +1,4 @@
-package resources
+package Resources
 
 type Request struct {
 	Text      string `json:"text"`
